@@ -1,0 +1,6 @@
+rootProject.name = 'profile-service'
+include ':api'
+include ':worker'
+include ':core'
+include ':model'
+

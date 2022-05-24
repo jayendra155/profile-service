@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: profile-service-worker
+  data:
+    mongodb:
+      database: profile
+  h2:
+    console:
+      enabled: true
+      path: /h2
+server:
+  port: 8081
+
+subscription:
+  apis:
+    validation:
+      enabled: true
+      applications:
+        SMS:
+          scheme:
+          host:
+          port:
+          path:
+          additional-properties:
+            headers:
+
+kafka:
+  broker:
+    urls: localhost:9092
+  consumer:
+    business-profile-update:
+        topic: business-profile-update
+
+resilience4j:
+  retry:
+    instances:
+      validateUpdateRequestFromClientSMS:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - java.net.SocketTimeoutException

@@ -1,0 +1,106 @@
+plugins {
+	id 'idea'
+	id 'eclipse'
+	id 'java'
+	id 'java-library'
+	id 'maven-publish'
+	id 'checkstyle'
+	id 'jacoco'
+	id 'org.springframework.boot' version '2.6.6'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group = 'com.user'
+version = project.property("version")
+//sourceCompatibility = '11'
+apply from: 'dependencies.gradle'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "2021.0.1")
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	//implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.apache.camel.springboot:camel-spring-boot-starter:3.16.0'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
+	implementation 'io.projectreactor.kafka:reactor-kafka:1.3.11'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+}
+
+allprojects {
+	//apply plugin: 'checkstyle'
+	apply plugin: 'jacoco'
+	apply plugin: 'java'
+	apply plugin: 'java-library'
+	apply plugin: 'maven-publish'
+	apply plugin: 'org.springframework.boot'
+
+	//sourceCompatibility = '11'
+
+	configurations {
+		developmentOnly
+		runtimeClasspath {
+			extendsFrom developmentOnly
+		}
+		compileOnly {
+			extendsFrom annotationProcessor
+		}
+	}
+
+	repositories {
+		mavenCentral()
+		maven {
+			url = "https://oss.sonatype.org/content/groups/public/org/springdoc/"
+		}
+	}
+
+	task sourcesJar(type: Jar) {
+		archiveClassifier = 'sources'
+		from sourceSets.main.allJava
+	}
+
+	task javadocJar(type: Jar) {
+		archiveClassifier = 'javadoc'
+		from javadoc.destinationDir
+	}
+
+	artifacts {
+		archives sourcesJar
+		archives javadocJar
+	}
+
+}
+bootJar {
+	enabled = false
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
